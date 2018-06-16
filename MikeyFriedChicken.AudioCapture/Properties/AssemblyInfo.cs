@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MikeyFriedChicken.AudioCapture")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription(".net Console Application to capture audio as a WAV and MP3 playing from any device on your computer")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("MikeyFriedChicken")]
 [assembly: AssemblyProduct("MikeyFriedChicken.AudioCapture")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]

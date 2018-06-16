@@ -16,21 +16,20 @@ namespace MikeyFriedChicken.AudioCapture
 
         }
 
-        public void Record(string waveFileName, string mp3FileName, bool includeMp3, bool prompt)
+        public void Record(string waveFileName, string mp3FileName, bool includeMp3)
         {
 
             int latency = 5;
             int sampleRate = 320000;//44100;
             int bits = 32;
             int channels = 2;
-            var encoding = AudioEncoding.MpegLayer3;
+            //var encoding = AudioEncoding.MpegLayer3;
 
             WaveFormat waveFormat = new WaveFormat(sampleRate,bits,channels);
 
             using (WasapiCapture capture = new WasapiLoopbackCapture(latency, waveFormat,ThreadPriority.Highest))
             {
-                if (prompt)
-                {
+
                     Dictionary<int, MMDevice> devices = new Dictionary<int, MMDevice>();
 
                     int i = 1;
@@ -40,7 +39,9 @@ namespace MikeyFriedChicken.AudioCapture
                         i++;
                     }
 
-                    foreach (var x in devices)
+                ColorConsole.WriteLine("Available devices:", ConsoleColor.Blue);
+
+                foreach (var x in devices)
                     {
                         if (x.Value.FriendlyName == capture.Device.FriendlyName)
                         {
@@ -54,37 +55,38 @@ namespace MikeyFriedChicken.AudioCapture
                     }
 
                     bool optionSelected = false;
-                    while (!optionSelected)
+                while (!optionSelected)
+                {
+
+                    ColorConsole.Write("Select which device above to record from 1,2,3... (Enter for default - ",
+                    ConsoleColor.White, capture.Device.FriendlyName);
+                    ColorConsole.Write("{0}", ConsoleColor.Cyan, capture.Device.FriendlyName);
+                    ColorConsole.Write(") $", ConsoleColor.White, capture.Device.FriendlyName);
+
+
+                    ConsoleKeyInfo key = Console.ReadKey();
+
+                    string keystring = key.KeyChar.ToString();
+
+                    if (key.Key == ConsoleKey.Enter)
                     {
-                        ColorConsole.Write("Select which device above to record from 1,2,3... (Enter for default - ", ConsoleColor.White, capture.Device.FriendlyName);
-                        ColorConsole.Write("{0}", ConsoleColor.Cyan, capture.Device.FriendlyName);
-                        ColorConsole.Write(") $", ConsoleColor.White, capture.Device.FriendlyName);
-
-                        ConsoleKeyInfo key = Console.ReadKey();
-                        Console.WriteLine();
-
-                        string keystring = key.KeyChar.ToString();
-
-                        if (key.Key == ConsoleKey.Enter)
-                        {
-                            optionSelected = true;
-                        }
-                        else if (int.TryParse(keystring, out var result))
-                        {
-                            capture.Device = devices[result];
-                            optionSelected = true;
-                        }
+                        optionSelected = true;
                     }
-
+                    else if (int.TryParse(keystring, out var result))
+                    {
+                        capture.Device = devices[result];
+                        optionSelected = true;
+                    }
                 }
 
+                Console.WriteLine();
                 ColorConsole.WriteLine("Recording initialising", ConsoleColor.Blue);
                 capture.Initialize();
 
                 using (WaveRecorder waveRecorder = new WaveRecorder(waveFileName, capture))
                 {
                     ColorConsole.Write("Press ENTER start recording $", ConsoleColor.White);
-                    if (prompt) WaitForEnter();
+                    WaitForEnter();
 
                     ColorConsole.WriteLine("Writing wave to file '{0}'", ConsoleColor.Blue, waveFileName);
                     waveRecorder.StartRecording();
@@ -95,14 +97,17 @@ namespace MikeyFriedChicken.AudioCapture
                     waveRecorder.EndRecording();
                 }
 
-                ColorConsole.WriteLine("Finished recording. '{0}' written to disk.", ConsoleColor.DarkMagenta, Path.GetFullPath(waveFileName));
+                ColorConsole.WriteLine("Finished recording", ConsoleColor.Blue, Path.GetFullPath(waveFileName));
+                ColorConsole.WriteLine("{0} written to disk.", ConsoleColor.Blue, Path.GetFullPath(waveFileName));
 
                 if (includeMp3)
                 {
                     ToMp3 toMp3 = new ToMp3();
+                    ColorConsole.WriteLine("Creating mp3 from wav...", ConsoleColor.Blue, Path.GetFullPath(mp3FileName));
                     toMp3.ConvertFromWave(waveFileName, mp3FileName);
 
-                    ColorConsole.WriteLine("Finished creating mp3. '{0}'", ConsoleColor.DarkMagenta, Path.GetFullPath(mp3FileName));
+                    ColorConsole.WriteLine("Finished creating mp3", ConsoleColor.Blue, Path.GetFullPath(mp3FileName));
+                    ColorConsole.WriteLine("{0} written to disk.", ConsoleColor.Blue, Path.GetFullPath(mp3FileName));
                     ColorConsole.Write("Press ENTER to exit application $", ConsoleColor.White, Path.GetFullPath(mp3FileName));
                     WaitForEnter();
                 }

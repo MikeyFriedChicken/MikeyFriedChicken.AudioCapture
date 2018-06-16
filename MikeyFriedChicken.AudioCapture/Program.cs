@@ -30,13 +30,7 @@ namespace MikeyFriedChicken.AudioCapture
                     .WithDescription("If true then the the output will also include an mp3 file")
                     .SetDefault(true);
 
-                p.Setup(arg => arg.Prompt)
-                    .As('p', "Prompt")
-                    .WithDescription("If true then the application will include prompts.")
-                    .SetDefault(false);
-
                 p.SetupHelp("?", "help").Callback(text => ColorConsole.WriteLine(text,ConsoleColor.Blue));
-                string helptext = p.HelpOption.ToString();
 
                 ICommandLineParserResult parserResult = p.Parse(args);
 
@@ -51,7 +45,7 @@ namespace MikeyFriedChicken.AudioCapture
 
                     ColorConsole.WriteLine("Starting audio recorder...", ConsoleColor.Blue);
                     Recorder recorder = new Recorder();
-                    recorder.Record(arguments.WaveFileName, arguments.MP3FileName, arguments.IncludeMP3, arguments.Prompt);
+                    recorder.Record(arguments.WaveFileName, arguments.MP3FileName, arguments.IncludeMP3);
 
                     ColorConsole.WriteLine("End of audio recorder", ConsoleColor.Blue);
                 }
